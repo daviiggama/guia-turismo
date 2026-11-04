@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 
 class AuthService {
   final String url = 'https://guia.liliaborges.com.br/login';
-  
+
   Future<Map> autenticar(String email, String senha) async {
     try {
       final response = await http.post(
@@ -19,8 +19,8 @@ class AuthService {
         debugPrint(dados.toString());
         return {};
       }
-    } catch(e) {
+    } catch (e) {
       rethrow;
     }
-  } 
+  }
 }

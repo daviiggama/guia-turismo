@@ -15,10 +15,12 @@ class _CadastroLugarState extends State<CadastroLugar> {
   final _formKey = GlobalKey<FormState>();
   final _nomeController = TextEditingController();
   final _descricaoController = TextEditingController();
+  final _enderecoController = TextEditingController();
   final _latitudeController = TextEditingController();
   final _longitudeController = TextEditingController();
   int? _categoriaId;
   bool _salvando = false;
+  bool _buscando = false;
 
   @override
   void initState() {
@@ -30,6 +32,7 @@ class _CadastroLugarState extends State<CadastroLugar> {
   void dispose() {
     _nomeController.dispose();
     _descricaoController.dispose();
+    _enderecoController.dispose();
     _latitudeController.dispose();
     _longitudeController.dispose();
     super.dispose();
@@ -45,6 +48,31 @@ class _CadastroLugarState extends State<CadastroLugar> {
     if (numero == null) return 'Número inválido';
     if (numero.abs() > limite) return 'Deve estar entre -$limite e $limite';
     return null;
+  }
+
+  // procura o endereço/CEP e preenche latitude e longitude
+  Future<void> _buscarEndereco() async {
+    final texto = _enderecoController.text.trim();
+    if (texto.isEmpty) return;
+    setState(() => _buscando = true);
+    String mensagem;
+    try {
+      final local =
+          await context.read<LugaresController>().buscarLocalizacao(texto);
+      if (local == null) {
+        mensagem = 'Endereço não encontrado. Tente ser mais específico.';
+      } else {
+        _latitudeController.text = local.latitude.toStringAsFixed(6);
+        _longitudeController.text = local.longitude.toStringAsFixed(6);
+        mensagem = 'Encontrado: ${local.endereco}';
+      }
+    } catch (e) {
+      mensagem = 'Não foi possível buscar o endereço.';
+    }
+    if (!mounted) return;
+    setState(() => _buscando = false);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(mensagem)));
   }
 
   Future<void> _salvar() async {
@@ -70,6 +98,20 @@ class _CadastroLugarState extends State<CadastroLugar> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(erro)));
     }
+  }
+
+  Widget _titulo(String texto) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10, top: 4),
+      child: Text(
+        texto,
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      ),
+    );
   }
 
   Widget _fotoSelecionada(BuildContext context) {
@@ -112,7 +154,9 @@ class _CadastroLugarState extends State<CadastroLugar> {
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _titulo('Informações'),
               TextFormField(
                 controller: _nomeController,
                 textCapitalization: TextCapitalization.sentences,
@@ -144,10 +188,40 @@ class _CadastroLugarState extends State<CadastroLugar> {
                   border: OutlineInputBorder(),
                 ),
                 items: categorias
-                    .map((c) => DropdownMenuItem(value: c.id, child: Text(c.nome)))
+                    .map((c) =>
+                        DropdownMenuItem(value: c.id, child: Text(c.nome)))
                     .toList(),
                 onChanged: (v) => setState(() => _categoriaId = v),
                 validator: (v) => v == null ? 'Selecione uma categoria' : null,
+              ),
+              const SizedBox(height: 16),
+              _titulo('Localização'),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _enderecoController,
+                      textInputAction: TextInputAction.search,
+                      onFieldSubmitted: (_) => _buscarEndereco(),
+                      decoration: const InputDecoration(
+                        labelText: 'Endereço ou CEP',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton.filled(
+                    tooltip: 'Buscar coordenadas',
+                    onPressed: _buscando ? null : _buscarEndereco,
+                    icon: _buscando
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.search),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
               Row(
@@ -180,6 +254,7 @@ class _CadastroLugarState extends State<CadastroLugar> {
                 ],
               ),
               const SizedBox(height: 16),
+              _titulo('Foto'),
               _fotoSelecionada(context),
               const SizedBox(height: 24),
               SizedBox(

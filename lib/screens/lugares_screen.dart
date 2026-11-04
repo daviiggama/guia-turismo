@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:guia/controllers/auth_controller.dart';
 import 'package:guia/controllers/lugares_controller.dart';
 import 'package:guia/controllers/theme_controller.dart';
+import 'package:guia/models/categoria_model.dart';
+import 'package:guia/services/session_service.dart';
 import 'package:provider/provider.dart';
 
 class LugaresScreen extends StatelessWidget {
@@ -11,8 +13,19 @@ class LugaresScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Lugares para visitar"),
+        title: FutureBuilder<String>(
+          future: SessionService().pegarNome(),
+          builder: (context, snapshot) {
+            final nome = snapshot.data ?? '';
+            return Text(nome.isEmpty ? 'Lugares para visitar' : 'Olá, $nome');
+          },
+        ),
         actions: [
+          IconButton(
+            tooltip: 'Ver no mapa',
+            icon: const Icon(Icons.map),
+            onPressed: () => Navigator.pushNamed(context, 'mapa'),
+          ),
           IconButton(
             tooltip: 'Alternar tema',
             icon: Icon(context.watch<ThemeController>().escuro
@@ -56,15 +69,34 @@ class LugaresScreen extends StatelessWidget {
               itemCount: lugaresController.lugares.length,
               itemBuilder: (context, index) {
                 final lugar = lugaresController.lugares[index];
+                final cores = Theme.of(context).colorScheme;
+                final descricao = lugar.descricao.trim();
                 return Card(
+                  elevation: 0,
+                  color: cores.surfaceContainerHighest.withValues(alpha: 0.5),
+                  margin: const EdgeInsets.symmetric(vertical: 5),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(14),
                   ),
-                  elevation: 2,
                   child: ListTile(
-                    title: Text(lugar.nome.isEmpty ? '(sem nome)' : lugar.nome),
-                    subtitle: Text(lugar.categoria ?? 'Sem categoria'),
-                    leading: const CircleAvatar(child: Icon(Icons.place)),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    leading: CircleAvatar(
+                      backgroundColor: cores.primaryContainer,
+                      foregroundColor: cores.onPrimaryContainer,
+                      child: Icon(iconeDaCategoria(lugar.categoria)),
+                    ),
+                    title: Text(
+                      lugar.nome.isEmpty ? '(sem nome)' : lugar.nome,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Text(
+                      descricao.isEmpty
+                          ? (lugar.categoria ?? 'Sem categoria')
+                          : '${lugar.categoria ?? 'Sem categoria'} · $descricao',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 );
               },

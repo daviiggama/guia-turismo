@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:guia/models/categoria_model.dart';
+import 'package:guia/models/localizacao_model.dart';
 import 'package:guia/models/lugares_model.dart';
 import 'package:guia/services/categorias_service.dart';
+import 'package:guia/services/localizacao_service.dart';
 import 'package:guia/services/lugares_services.dart';
 import 'package:guia/services/session_service.dart';
 
@@ -41,6 +43,11 @@ class LugaresController extends ChangeNotifier {
       erro = "Erro ao carregar categorias: $e";
     }
     notifyListeners();
+  }
+
+  /// Devolve a localização ou null se o endereço não for encontrado.
+  Future<LocalizacaoModel?> buscarLocalizacao(String texto) {
+    return LocalizacaoService().buscarLocalizacao(texto);
   }
 
   /// Devolve null em caso de sucesso, ou a mensagem de erro.

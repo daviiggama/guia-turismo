@@ -71,6 +71,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 8),
                   Text('Guia de Turismo',
                       style: Theme.of(context).textTheme.headlineMedium),
+                  const SizedBox(height: 4),
+                  const Text('Descubra e cadastre lugares para visitar'),
                   const SizedBox(height: 32),
                   TextFormField(
                     controller: _emailController,
@@ -108,6 +110,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           : const Text('Entrar'),
                     ),
                   ),
+                  const SizedBox(height: 32),
+                  const Text('Desenvolvido por Davi',
+                      style: TextStyle(fontSize: 12)),
                 ],
               ),
             ),

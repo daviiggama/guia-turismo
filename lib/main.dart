@@ -6,7 +6,11 @@ import 'package:guia/controllers/theme_controller.dart';
 import 'package:guia/screens/cadastro_lugar.dart';
 import 'package:guia/screens/login_screen.dart';
 import 'package:guia/screens/lugares_screen.dart';
+import 'package:guia/screens/mapa_screen.dart';
 import 'package:provider/provider.dart';
+
+// cor da identidade do app (azul oceano)
+const corPrincipal = Color(0xFF1E6FB8);
 
 void main() {
   runApp(const Inicializar());
@@ -26,24 +30,25 @@ class Inicializar extends StatelessWidget {
       ],
       child: Consumer<ThemeController>(
         builder: (context, tema, child) => MaterialApp(
-        title: 'Guia de Turismo',
-        debugShowCheckedModeBanner: false,
-        themeMode: tema.modo,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-          useMaterial3: true,
-        ),
-        darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.teal, brightness: Brightness.dark),
-          useMaterial3: true,
-        ),
-        initialRoute: 'login',
-        routes: {
-          'login': (context) => const LoginScreen(),
-          'lugares': (context) => const LugaresScreen(),
-          'cadastro': (context) => const CadastroLugar(),
-        },
+          title: 'Guia de Turismo',
+          debugShowCheckedModeBanner: false,
+          themeMode: tema.modo,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: corPrincipal),
+            useMaterial3: true,
+          ),
+          darkTheme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+                seedColor: corPrincipal, brightness: Brightness.dark),
+            useMaterial3: true,
+          ),
+          initialRoute: 'login',
+          routes: {
+            'login': (context) => const LoginScreen(),
+            'lugares': (context) => const LugaresScreen(),
+            'cadastro': (context) => const CadastroLugar(),
+            'mapa': (context) => const MapaScreen(),
+          },
         ),
       ),
     );

@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 class LugaresServices {
   String url = 'https://guia.liliaborges.com.br/lugares';
   int pagina = 1;
-  int limite = 10;
+  int limite = 200; // traz todos, o mapa precisa de todos os pontos
 
   Future<List<LugaresModel>> buscarLugares() async {
     try {
@@ -40,6 +40,9 @@ class LugaresServices {
     final Map<String, dynamic> corpo = jsonDecode(resposta.body);
     if (resposta.statusCode == 201 || resposta.statusCode == 200) {
       return corpo['message'] ?? 'Lugar cadastrado com sucesso!';
+    }
+    if (resposta.statusCode == 401 || resposta.statusCode == 403) {
+      throw Exception('Sessão expirada. Saia e faça login novamente.');
     }
     throw Exception(corpo['message'] ?? 'Erro ${resposta.statusCode}');
   }
