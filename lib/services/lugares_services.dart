@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 class LugaresServices {
   String url = 'https://guia.liliaborges.com.br/lugares';
   int pagina = 1;
-  int limite = 200; // traz todos, o mapa precisa de todos os pontos
+  int limite = 100; // quantidade de lugares carregados (lista e mapa)
 
   Future<List<LugaresModel>> buscarLugares() async {
     try {

@@ -76,8 +76,9 @@ class _MapaScreenState extends State<MapaScreen> {
                   _categoriaFiltro == null ||
                   (l.categoria ?? 'Sem categoria') == _categoriaFiltro)
               .toList();
-          final pontos =
-              todos.map((l) => LatLng(l.latitude, l.longitude)).toList();
+          final pontos = todos
+              .map((l) => LatLng(l.latitude.toDouble(), l.longitude.toDouble()))
+              .toList();
 
           return Stack(
             children: [
@@ -106,7 +107,8 @@ class _MapaScreenState extends State<MapaScreen> {
                       // pins dos lugares, com a foto de cada um
                       ...lugares.map((lugar) {
                         return Marker(
-                          point: LatLng(lugar.latitude, lugar.longitude),
+                          point: LatLng(lugar.latitude.toDouble(),
+                              lugar.longitude.toDouble()),
                           width: 52,
                           height: 52,
                           child: GestureDetector(

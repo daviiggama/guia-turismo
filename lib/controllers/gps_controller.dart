@@ -18,13 +18,13 @@ class GpsController extends ChangeNotifier {
 
   /// Distância em texto até um ponto (ex: "850 m" ou "12,3 km").
   /// Retorna null se ainda não temos a posição do usuário.
-  String? distanciaAte(double latitude, double longitude) {
+  String? distanciaAte(num latitude, num longitude) {
     if (posicao == null) return null;
     final metros = Geolocator.distanceBetween(
       posicao!.latitude,
       posicao!.longitude,
-      latitude,
-      longitude,
+      latitude.toDouble(),
+      longitude.toDouble(),
     );
     if (metros < 1000) return '${metros.round()} m';
     return '${(metros / 1000).toStringAsFixed(1).replaceAll('.', ',')} km';

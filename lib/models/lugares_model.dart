@@ -2,8 +2,9 @@ class LugaresModel {
   final int id;
   final String nome;
   final String? categoria;
-  final double latitude;
-  final double longitude;
+  // num porque a API pode mandar inteiro (ex: 0) ou decimal
+  final num latitude;
+  final num longitude;
   final String descricao;
   final int categoriaId;
   final List<String> fotos;
@@ -25,9 +26,8 @@ class LugaresModel {
       nome: json['nome'] ?? '',
       categoria: json['categoria']?['nome'],
       categoriaId: json['categoriaId'] ?? 0,
-      // a API pode devolver inteiro (ex: 0) ou vazio, então converte via num
-      latitude: (json['latitude'] as num? ?? 0).toDouble(),
-      longitude: (json['longitude'] as num? ?? 0).toDouble(),
+      latitude: json['latitude'] ?? 0,
+      longitude: json['longitude'] ?? 0,
       descricao: json['descricao'] ?? '',
       // a galeria vem como lista de { id, urlFoto, lugarId }
       fotos: (json['galeria'] as List? ?? [])
