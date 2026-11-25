@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:guia/models/categoria_model.dart';
 import 'package:guia/models/localizacao_model.dart';
@@ -10,6 +11,7 @@ import 'package:guia/services/session_service.dart';
 class LugaresController extends ChangeNotifier {
   bool carregando = false;
   String erro = "";
+  String aviso = ""; // mensagem quando o lugar foi salvo mas a foto falhou
   List<LugaresModel> _lugares = [];
   List<LugaresModel> get lugares => _lugares;
   List<CategoriaModel> _categorias = [];
@@ -51,13 +53,28 @@ class LugaresController extends ChangeNotifier {
   }
 
   /// Devolve null em caso de sucesso, ou a mensagem de erro.
-  Future<String?> cadastrarLugar(LugaresModel dados) async {
+  Future<String?> cadastrarLugar(LugaresModel dados, {File? foto}) async {
     final token = await SessionService().pegarToken() ?? '';
     carregando = true;
     erro = "";
+    aviso = "";
     notifyListeners();
     try {
-      await LugaresServices().cadastrarLugar(dados, token);
+      final service = LugaresServices();
+      int? id = await service.cadastrarLugar(dados, token);
+
+      if (foto != null) {
+        // se a API não devolveu o id, procura o lugar recém criado na lista
+        if (id == null) {
+          final lista = await service.buscarLugares();
+          id = lista.firstWhere((l) => l.nome == dados.nome).id;
+        }
+        try {
+          await service.enviarFoto(id, foto, token);
+        } catch (e) {
+          aviso = 'Lugar cadastrado, mas a foto não foi enviada.';
+        }
+      }
       await listarLugares();
       return null;
     } catch (e) {

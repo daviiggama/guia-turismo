@@ -6,6 +6,7 @@ class LugaresModel {
   final double longitude;
   final String descricao;
   final int categoriaId;
+  final List<String> fotos;
 
   LugaresModel({
     this.id = 0,
@@ -15,6 +16,7 @@ class LugaresModel {
     required this.longitude,
     required this.categoriaId,
     this.descricao = '',
+    this.fotos = const [],
   });
 
   factory LugaresModel.fromJson(Map<String, dynamic> json) {
@@ -22,11 +24,15 @@ class LugaresModel {
       id: json['id'],
       nome: json['nome'] ?? '',
       categoria: json['categoria']?['nome'],
-      categoriaId: json['categoriaId'],
-      // a API pode devolver inteiro (ex: 0), então converte via num
-      latitude: (json['latitude'] as num).toDouble(),
-      longitude: (json['longitude'] as num).toDouble(),
+      categoriaId: json['categoriaId'] ?? 0,
+      // a API pode devolver inteiro (ex: 0) ou vazio, então converte via num
+      latitude: (json['latitude'] as num? ?? 0).toDouble(),
+      longitude: (json['longitude'] as num? ?? 0).toDouble(),
       descricao: json['descricao'] ?? '',
+      // a galeria vem como lista de { id, urlFoto, lugarId }
+      fotos: (json['galeria'] as List? ?? [])
+          .map((foto) => foto['urlFoto'].toString())
+          .toList(),
     );
   }
 

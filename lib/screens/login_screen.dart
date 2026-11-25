@@ -36,6 +36,19 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  Future<void> _entrarComGoogle() async {
+    final auth = context.read<AuthController>();
+    final ok = await auth.entrarComGoogle();
+    if (!mounted) return;
+    if (ok) {
+      Navigator.pushReplacementNamed(context, 'lugares');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(auth.erro)),
+      );
+    }
+  }
+
   Future<void> _entrar() async {
     if (!_formKey.currentState!.validate()) return;
     final auth = context.read<AuthController>();
@@ -108,6 +121,15 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : const Text('Entrar'),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: auth.carregando ? null : _entrarComGoogle,
+                      icon: const Icon(Icons.account_circle),
+                      label: const Text('Entrar com Google'),
                     ),
                   ),
                   const SizedBox(height: 32),

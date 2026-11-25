@@ -8,6 +8,11 @@ class CameraController extends ChangeNotifier {
   File? _imagemSelecionada;
   File? get imagemSelecionada => _imagemSelecionada;
 
+  // tira a foto escolhida (usado ao abrir o cadastro)
+  void limparImagem() {
+    _imagemSelecionada = null;
+  }
+
   Future<void> abrirGaleria() async {
     carregando = true;
     notifyListeners();

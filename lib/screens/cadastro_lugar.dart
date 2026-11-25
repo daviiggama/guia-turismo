@@ -26,6 +26,7 @@ class _CadastroLugarState extends State<CadastroLugar> {
   void initState() {
     super.initState();
     context.read<LugaresController>().carregarCategorias();
+    context.read<CameraController>().limparImagem();
   }
 
   @override
@@ -86,13 +87,20 @@ class _CadastroLugarState extends State<CadastroLugar> {
       longitude: _paraDouble(_longitudeController.text)!,
       categoriaId: _categoriaId!,
     );
-    final erro = await context.read<LugaresController>().cadastrarLugar(lugar);
+    final erro = await context.read<LugaresController>().cadastrarLugar(
+          lugar,
+          foto: context.read<CameraController>().imagemSelecionada,
+        );
 
     if (!mounted) return;
     setState(() => _salvando = false);
     if (erro == null) {
+      final aviso = context.read<LugaresController>().aviso;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Lugar cadastrado com sucesso!')),
+        SnackBar(
+          content:
+              Text(aviso.isEmpty ? 'Lugar cadastrado com sucesso!' : aviso),
+        ),
       );
       Navigator.pop(context);
     } else {
